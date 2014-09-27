@@ -1,22 +1,36 @@
 package com.example.charity.gps_client;
 
+import android.content.Context;
+import android.location.Location;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    Handler mHandler = new Handler();
+    Context mContext = this;
+    GPSLocation mGPSLocation;
+    Location currentLocation;
+    LatLng currentLatLng = new LatLng(0, 0);
+    Marker currentMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        initialize();
+        mHandler.postDelayed(updateGPS, 5000);
     }
 
     @Override
@@ -62,4 +76,26 @@ public class MapsActivity extends FragmentActivity {
     private void setUpMap() {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
+
+    private void initialize(){
+        mGPSLocation = new GPSLocation(this);
+        currentMarker = mMap.addMarker(new MarkerOptions().position(currentLatLng));
+
+    }
+
+    private Runnable updateGPS = new Runnable() {
+        @Override
+        public void run() {
+            currentLocation = mGPSLocation.getLocation();
+            LatLng mLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
+
+            // Zoom in the Google Map
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+            currentMarker.setPosition(mLatLng);
+
+            Toast.makeText(mContext, "Longitude: " + String.valueOf(currentLocation.getLongitude()) + ", Latitude: " + String.valueOf(currentLocation.getLatitude()), Toast.LENGTH_SHORT).show();
+            mHandler.postDelayed(updateGPS, 5000);
+        }
+    };
 }
