@@ -20,7 +20,6 @@ public class MapsActivity extends FragmentActivity {
     Handler mHandler = new Handler();
     Context mContext = this;
     GPSLocation mGPSLocation;
-    MapHttpRequest mapHttpRequest;
 
     Location currentLocation;
     LatLng currentLatLng = new LatLng(0, 0);
@@ -85,7 +84,6 @@ public class MapsActivity extends FragmentActivity {
     private void initialize(){
         mGPSLocation = new GPSLocation(this);
         currentMarker = mMap.addMarker(new MarkerOptions().position(currentLatLng));
-        mapHttpRequest = new MapHttpRequest(this);
     }
 
     private Runnable updateGPS = new Runnable() {
@@ -100,7 +98,7 @@ public class MapsActivity extends FragmentActivity {
             currentMarker.setPosition(mLatLng);
 
             // Send request to server
-            mapHttpRequest.sendGPS(mLatLng);
+            new MapHttpRequest().execute(mLatLng);
 
             Toast.makeText(mContext, "Longitude: " + String.valueOf(currentLocation.getLongitude()) + ", Latitude: " + String.valueOf(currentLocation.getLatitude()), Toast.LENGTH_SHORT).show();
             mHandler.postDelayed(updateGPS, TIME_UPDATE);
