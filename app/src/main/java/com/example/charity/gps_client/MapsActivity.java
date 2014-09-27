@@ -20,11 +20,14 @@ public class MapsActivity extends FragmentActivity {
     Handler mHandler = new Handler();
     Context mContext = this;
     GPSLocation mGPSLocation;
+    MapHttpRequest mapHttpRequest;
+
     Location currentLocation;
     LatLng currentLatLng = new LatLng(0, 0);
     Marker currentMarker;
     int TIME_UPDATE = 5000;
     int ZOOM_LEVEL = 15;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +85,7 @@ public class MapsActivity extends FragmentActivity {
     private void initialize(){
         mGPSLocation = new GPSLocation(this);
         currentMarker = mMap.addMarker(new MarkerOptions().position(currentLatLng));
-
+        mapHttpRequest = new MapHttpRequest(this);
     }
 
     private Runnable updateGPS = new Runnable() {
@@ -95,6 +98,9 @@ public class MapsActivity extends FragmentActivity {
             // Zoom in the Google Map
             mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
             currentMarker.setPosition(mLatLng);
+
+            // Send request to server
+            mapHttpRequest.sendGPS(mLatLng);
 
             Toast.makeText(mContext, "Longitude: " + String.valueOf(currentLocation.getLongitude()) + ", Latitude: " + String.valueOf(currentLocation.getLatitude()), Toast.LENGTH_SHORT).show();
             mHandler.postDelayed(updateGPS, TIME_UPDATE);
