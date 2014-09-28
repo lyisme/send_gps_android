@@ -20,9 +20,13 @@ public class MapsActivity extends FragmentActivity {
     Handler mHandler = new Handler();
     Context mContext = this;
     GPSLocation mGPSLocation;
+
     Location currentLocation;
     LatLng currentLatLng = new LatLng(0, 0);
     Marker currentMarker;
+    int TIME_UPDATE = 5000;
+    int ZOOM_LEVEL = 15;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +34,7 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         initialize();
-        mHandler.postDelayed(updateGPS, 5000);
+        mHandler.postDelayed(updateGPS, TIME_UPDATE);
     }
 
     @Override
@@ -74,13 +78,12 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
     private void initialize(){
         mGPSLocation = new GPSLocation(this);
         currentMarker = mMap.addMarker(new MarkerOptions().position(currentLatLng));
-
     }
 
     private Runnable updateGPS = new Runnable() {
@@ -91,11 +94,14 @@ public class MapsActivity extends FragmentActivity {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
 
             // Zoom in the Google Map
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
             currentMarker.setPosition(mLatLng);
 
+            // Send request to server
+            new MapHttpRequest().execute(mLatLng);
+
             Toast.makeText(mContext, "Longitude: " + String.valueOf(currentLocation.getLongitude()) + ", Latitude: " + String.valueOf(currentLocation.getLatitude()), Toast.LENGTH_SHORT).show();
-            mHandler.postDelayed(updateGPS, 5000);
+            mHandler.postDelayed(updateGPS, TIME_UPDATE);
         }
     };
 }
