@@ -3,6 +3,7 @@ package com.example.charity.gps_client;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -34,7 +35,6 @@ public class MapHttpRequest extends AsyncTask<LatLng, Void, Void> {
     protected Void doInBackground(LatLng... args) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(host+api+id);
-        HttpResponse httpResponse;
 
         LatLng latLng = (LatLng)args[0];
         List<NameValuePair> params = new ArrayList<NameValuePair>(3);
@@ -43,7 +43,8 @@ public class MapHttpRequest extends AsyncTask<LatLng, Void, Void> {
         params.add(new BasicNameValuePair("lng", String.valueOf(latLng.longitude)));
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(params));
-//            httpResponse = httpClient.execute(httpPost);
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            Log.d("response", httpResponse.toString());
 
         } catch (Exception e) {
             e.printStackTrace();
