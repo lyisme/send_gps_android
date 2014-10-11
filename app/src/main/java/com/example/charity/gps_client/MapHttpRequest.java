@@ -26,19 +26,16 @@ import java.util.List;
 /*
  * Created by charity on 2014-09-27.
  */
-public class MapHttpRequest extends AsyncTask<LatLng, Void, Void> {
-    String host = "http://192.168.1.109:8080";
-    String api = "/BusTracking-Web/bustracker/api/bus/";
+public class MapHttpRequest extends AsyncTask<LatLng, Void, Void>  implements Settings{
     String id = "bus1";
 
     @Override
     protected Void doInBackground(LatLng... args) {
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(host + api + id);
+        HttpPost httpPost = new HttpPost(HOST_NAME + APIS.get("send_gps") + id);
 
         LatLng latLng = (LatLng)args[0];
         List<NameValuePair> params = new ArrayList<NameValuePair>(3);
-//        params.add(new BasicNameValuePair("code", id));
         params.add(new BasicNameValuePair("latitude", String.valueOf(latLng.latitude)));
         params.add(new BasicNameValuePair("longitude", String.valueOf(latLng.longitude)));
         try {

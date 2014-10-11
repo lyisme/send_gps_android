@@ -25,7 +25,12 @@ public class GPSLocation{
     }
 
     public Location getLocation(){
-        return currentLocation;
+        if (currentLocation != null){
+            return currentLocation;
+        }else{
+            return mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+
     }
 
     LocationListener locationListener = new LocationListener() {

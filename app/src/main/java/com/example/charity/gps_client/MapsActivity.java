@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends FragmentActivity implements Settings{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     Handler mHandler = new Handler();
@@ -24,9 +24,6 @@ public class MapsActivity extends FragmentActivity {
     Location currentLocation;
     LatLng currentLatLng = new LatLng(0, 0);
     Marker currentMarker;
-    int TIME_UPDATE = 5000;
-    int ZOOM_LEVEL = 15;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,17 +87,22 @@ public class MapsActivity extends FragmentActivity {
         @Override
         public void run() {
             currentLocation = mGPSLocation.getLocation();
-            LatLng mLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
+            if (currentLocation != null){
+                LatLng mLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
 
-            // Zoom in the Google Map
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
-            currentMarker.setPosition(mLatLng);
+                // Zoom in the Google Map
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
+                currentMarker.setPosition(mLatLng);
 
-            // Send request to server
-            new MapHttpRequest().execute(mLatLng);
+                // Send request to server
+                new MapHttpRequest().execute(mLatLng);
 
-            Toast.makeText(mContext, "Longitude: " + String.valueOf(currentLocation.getLongitude()) + ", Latitude: " + String.valueOf(currentLocation.getLatitude()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Longitude: " + String.valueOf(currentLocation.getLongitude()) + ", Latitude: " + String.valueOf(currentLocation.getLatitude()), Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(mContext, "Can not get current location", Toast.LENGTH_LONG);
+            }
+
             mHandler.postDelayed(updateGPS, TIME_UPDATE);
         }
     };
