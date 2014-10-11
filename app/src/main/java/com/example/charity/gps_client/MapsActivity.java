@@ -5,6 +5,8 @@ import android.location.Location;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,13 +27,19 @@ public class MapsActivity extends FragmentActivity implements Settings{
     LatLng currentLatLng = new LatLng(0, 0);
     Marker currentMarker;
 
+    enum MAP_STATUS  {
+        START,
+        STOP
+    }
+
+    private MAP_STATUS currentMapStatus = MAP_STATUS.STOP;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         initialize();
-        mHandler.postDelayed(updateGPS, TIME_UPDATE);
     }
 
     @Override
@@ -75,7 +83,7 @@ public class MapsActivity extends FragmentActivity implements Settings{
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        mMap.getUiSettings().setZoomControlsEnabled(false);
     }
 
     private void initialize(){
@@ -106,4 +114,26 @@ public class MapsActivity extends FragmentActivity implements Settings{
             mHandler.postDelayed(updateGPS, TIME_UPDATE);
         }
     };
+
+    public void startSendGPS(View view){
+        if (currentMapStatus == MAP_STATUS.STOP){
+            // If Stop then Start it
+            mHandler.postDelayed(updateGPS, TIME_UPDATE);
+            Toast.makeText(mContext, "Start track GPS", Toast.LENGTH_SHORT);
+            setTextStartButton(getString(R.string.stop));
+            currentMapStatus = MAP_STATUS.START;
+        }else{
+            // If Start then Stop it
+            mHandler.removeCallbacks(updateGPS);
+            Toast.makeText(mContext, "Stop track GPS", Toast.LENGTH_SHORT);
+            setTextStartButton(getString(R.string.start));
+            currentMapStatus = MAP_STATUS.STOP;
+        }
+
+    }
+
+    public void setTextStartButton(String text){
+        Button btn = (Button)findViewById(R.id.start_btn);
+        btn.setText(text);
+    }
 }
