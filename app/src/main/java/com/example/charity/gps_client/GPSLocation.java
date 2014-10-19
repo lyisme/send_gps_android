@@ -21,7 +21,15 @@ public class GPSLocation{
     public GPSLocation(Activity activity){
         mContext = activity;
         mLocationManager = (LocationManager)activity.getSystemService(mContext.LOCATION_SERVICE);
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+        if (mLocationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)){
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        }else if (mLocationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)){
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        }else{
+            mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, locationListener);
+        }
+
     }
 
     public Location getLocation(){
